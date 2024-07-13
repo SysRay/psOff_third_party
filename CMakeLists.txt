@@ -12,13 +12,14 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_CXX_FLAGS_RELEASE "-fno-strict-aliasing -Wno-unused-command-line-argument")
+set(CMAKE_CXX_FLAGS_RELEASE "-fno-strict-aliasing")
 
 if(WIN32)
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD /Zi /GS- /GF /Gy /GR /Oi -Os")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /OPT:REF,ICF")
 else()
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fno-stack-protector")
+
   # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fshort-wchar")
 endif()
 
@@ -186,7 +187,7 @@ ExternalProject_Add(libzip_project
 )
 ExternalProject_Add_StepDependencies(libzip_project install zlib_project)
 
-set(BOOST_INCLUDE_LIBRARIES "program_options;date_time;interprocess;stacktrace;uuid;beast;signals2;thread;url;asio;dll;serialization;iostreams")
+set(BOOST_INCLUDE_LIBRARIES "program_options;date_time;interprocess;stacktrace;uuid;beast;signals2;thread;url;asio;dll;serialization;iostreams;process")
 ExternalProject_Add(boost_project
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/boost
   BINARY_DIR ${BUILDS_DIR}/boost
@@ -206,17 +207,17 @@ ExternalProject_Add(boost_project
 )
 
 if(WIN32) # We don't need this library on Linux
-ExternalProject_Add(wepoll_project
-  SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/wepoll
-  BINARY_DIR ${BUILDS_DIR}/wepoll
-  CMAKE_ARGS
-  -DCMAKE_BUILD_TYPE:STRING=Release
-  -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-  -DCMAKE_INSTALL_MESSAGE=${CMAKE_INSTALL_MESSAGE}
-  -DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}
-  -DCMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}
-  -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
-)
+  ExternalProject_Add(wepoll_project
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/wepoll
+    BINARY_DIR ${BUILDS_DIR}/wepoll
+    CMAKE_ARGS
+    -DCMAKE_BUILD_TYPE:STRING=Release
+    -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+    -DCMAKE_INSTALL_MESSAGE=${CMAKE_INSTALL_MESSAGE}
+    -DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}
+    -DCMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}
+    -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
+  )
 endif()
 
 ExternalProject_Add(pugixml_project
