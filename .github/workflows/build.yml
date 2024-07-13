@@ -28,6 +28,9 @@ jobs:
           with:
             submodules: recursive
 
+        - name: Run preparation command
+          run: ${{ matrix.config.preparation }}
+
         - name: Apply Boost Semaphore Patch
           working-directory: projects/boost/libs/interprocess
           run: git apply ../../../../patches/interprocess_semaphore.patch
