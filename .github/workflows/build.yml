@@ -52,7 +52,7 @@ jobs:
             cache: true
 
         - name: Configure
-          run: cmake -S. -B_build/_Release -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=_build/_Install -DCMAKE_C_COMPILER=${{ matrix.config.compiler }} -DCMAKE_CXX_COMPILER=${{ matrix.config.compiler_cxx }}
+          run: cmake -S. -B_build/_Release -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=${{ matrix.config.compiler }} -DCMAKE_CXX_COMPILER=${{ matrix.config.compiler_cxx }}
 
         - name: Build
           run: cmake --build _build/_Release -j4
@@ -63,10 +63,10 @@ jobs:
         - name: Zip it up
           working-directory: _build/_Release
           run: |
-            7z a psOff-3rd-${{ matrix.config.name }}.7z -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on .\install\* -xr!licenses
+            7z a psOff-3rd-${{ matrix.config.name }}.7z -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on ./install/* -xr!licenses
 
         - name: Upload artifacts
           uses: actions/upload-artifact@v4
           with:
             name: psOff-3rd-${{ matrix.config.name }}
-            path: _build/_Release/psOff-3rd-${{ matrix.config.name }}.zip
+            path: _build/_Release/psOff-3rd-${{ matrix.config.name }}.7z
