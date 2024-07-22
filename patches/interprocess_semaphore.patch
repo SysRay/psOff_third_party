@@ -21,6 +21,49 @@ index abb74e8..afbf437 100644
  }  //namespace interprocess {
  }  //namespace boost {
  
+diff --git a/include/boost/interprocess/sync/posix/semaphore.hpp b/include/boost/interprocess/sync/posix/semaphore.hpp
+index bf64d43..5688070 100644
+--- a/include/boost/interprocess/sync/posix/semaphore.hpp
++++ b/include/boost/interprocess/sync/posix/semaphore.hpp
+@@ -50,6 +50,9 @@ class posix_semaphore
+    bool try_wait()
+    {  return semaphore_try_wait(&m_sem); }
+ 
++   int get_count()
++   { return semaphore_get_count(&m_sem); }
++
+    template<class TimePoint>
+    bool timed_wait(const TimePoint &abs_time)
+    {  return semaphore_timed_wait(&m_sem, abs_time); }
+diff --git a/include/boost/interprocess/sync/posix/semaphore_wrapper.hpp b/include/boost/interprocess/sync/posix/semaphore_wrapper.hpp
+index c77397a..eb0f62c 100644
+--- a/include/boost/interprocess/sync/posix/semaphore_wrapper.hpp
++++ b/include/boost/interprocess/sync/posix/semaphore_wrapper.hpp
+@@ -143,6 +143,7 @@ inline bool semaphore_unlink(const char *semname)
+ inline void semaphore_init(sem_t *handle, unsigned int initialCount)
+ {
+    int ret = sem_init(handle, 1, initialCount);
++
+    //According to SUSV3 version 2003 edition, the return value of a successful
+    //sem_init call is not defined, but -1 is returned on failure.
+    //In the future, a successful call might be required to return 0.
+@@ -192,6 +193,16 @@ inline bool semaphore_try_wait(sem_t *handle)
+    throw interprocess_exception(err);
+ }
+ 
++inline int semaphore_get_count(sem_t *handle)
++{
++   int value;
++   int res = sem_getvalue(handle, &value);
++   if (res == 0)
++      return value;
++   error_info err = system_error_code();
++   throw interprocess_exception(err);
++}
++
+ #ifndef BOOST_INTERPROCESS_POSIX_TIMEOUTS
+ 
+ struct semaphore_wrapper_try_wrapper
 diff --git a/include/boost/interprocess/sync/spin/semaphore.hpp b/include/boost/interprocess/sync/spin/semaphore.hpp
 index cd3c866..50ad0ef 100644
 --- a/include/boost/interprocess/sync/spin/semaphore.hpp
