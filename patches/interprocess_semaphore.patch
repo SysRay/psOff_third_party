@@ -1,5 +1,5 @@
 diff --git a/include/boost/interprocess/sync/interprocess_semaphore.hpp b/include/boost/interprocess/sync/interprocess_semaphore.hpp
-index abb74e8..afbf437 100644
+index abb74e8..f4a336f 100644
 --- a/include/boost/interprocess/sync/interprocess_semaphore.hpp
 +++ b/include/boost/interprocess/sync/interprocess_semaphore.hpp
 @@ -93,7 +93,7 @@ class interprocess_semaphore
@@ -7,7 +7,7 @@ index abb74e8..afbf437 100644
  
     //!Returns the interprocess_semaphore count
 -//   int get_count() const;
-+   int get_count() const;
++   int get_count();
     #if !defined(BOOST_INTERPROCESS_DOXYGEN_INVOKED)
     private:
     #if defined(BOOST_INTERPROCESS_SEMAPHORE_USE_POSIX)
@@ -15,7 +15,7 @@ index abb74e8..afbf437 100644
  inline void interprocess_semaphore::post()
  { m_sem.post(); }
  
-+inline int interprocess_semaphore::get_count() const
++inline int interprocess_semaphore::get_count()
 +{ return m_sem.get_count(); }
 +
  }  //namespace interprocess {
@@ -65,7 +65,7 @@ index c77397a..eb0f62c 100644
  
  struct semaphore_wrapper_try_wrapper
 diff --git a/include/boost/interprocess/sync/spin/semaphore.hpp b/include/boost/interprocess/sync/spin/semaphore.hpp
-index cd3c866..50ad0ef 100644
+index cd3c866..f692f13 100644
 --- a/include/boost/interprocess/sync/spin/semaphore.hpp
 +++ b/include/boost/interprocess/sync/spin/semaphore.hpp
 @@ -12,83 +12,76 @@
@@ -120,7 +120,7 @@ index cd3c866..50ad0ef 100644
 -   void wait();
 -   bool try_wait();
 -   template<class TimePoint> bool timed_wait(const TimePoint &abs_time);
-+  int get_count() const;
++  int get_count();
  
 -//   int get_count() const;
 -   private:
@@ -172,7 +172,7 @@ index cd3c866..50ad0ef 100644
 -{
 -   ipcdetail::lock_to_wait<spin_semaphore> lw(*this);
 -   return ipcdetail::try_based_timed_lock(lw, abs_time);
-+inline int spin_semaphore::get_count() const {
++inline int spin_semaphore::get_count() {
 +  return (int)ipcdetail::atomic_read32(&m_count);
  }
  
