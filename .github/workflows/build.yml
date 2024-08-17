@@ -1,18 +1,35 @@
 name: build
 
 on:
-  push:
-    tags: v.*.*
+  workflow_dispatch:
 
 jobs:
   build:
       name: third_party
-      runs-on: windows-latest
+      strategy:
+        fail-fast: false
+        matrix:
+          config:
+            - name: Windows
+              os: windows-latest
+              compiler: 'clang-cl.exe'
+              compiler_cxx: 'clang-cl.exe'
+              preparation: ''
+            - name: Linux
+              os: ubuntu-24.04
+              compiler: 'clang-17'
+              compiler_cxx: 'clang++-17'
+              preparation: 'sudo apt update -y && sudo apt install -y ninja-build'
+
+      runs-on: ${{ matrix.config.os }}
       steps:
         - name: Checkout repository
           uses: actions/checkout@v4
           with:
             submodules: recursive
+
+        - name: Run preparation command
+          run: ${{ matrix.config.preparation }}
 
         - name: Apply Boost Semaphore Patch
           working-directory: projects/boost/libs/interprocess
@@ -23,9 +40,11 @@ jobs:
           run: git apply ../../patches/vulkan_alloc.patch
 
         - name: Detect MSVC
-          uses: ilammy/msvc-dev-cmd@v1
+          uses: ilammy/msvc-dev-cmd@v1.13.0
+          if: ${{ matrix.config.name == 'Windows' }}
           with:
             arch: x86_64
+
         - name: Prepare Vulkan SDK
           uses: humbletim/install-vulkan-sdk@c2aa128094d42ba02959a660f03e0a4e012192f9
           with:
@@ -33,7 +52,7 @@ jobs:
             cache: true
 
         - name: Configure
-          run: cmake -S. -B_build/_Release -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=_build/_Install -DCMAKE_C_COMPILER=clang-cl.exe -DCMAKE_CXX_COMPILER=clang-cl.exe
+          run: cmake -S. -B_build/_Release -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=${{ matrix.config.compiler }} -DCMAKE_CXX_COMPILER=${{ matrix.config.compiler_cxx }}
 
         - name: Build
           run: cmake --build _build/_Release -j4
@@ -44,11 +63,10 @@ jobs:
         - name: Zip it up
           working-directory: _build/_Release
           run: |
-            7z a psOff-3rd.zip .\install\* -xr!licenses
+            7z a psOff-3rd-${{ matrix.config.name }}.7z -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on ./install/* -xr!licenses
 
-        - name: Create release
-          uses: softprops/action-gh-release@v2
+        - name: Upload artifacts
+          uses: actions/upload-artifact@v4
           with:
-            prerelease: false
-            name: psOff thirdparty ${{ github.ref_name }}
-            files: _build/_Release/psOff-3rd.zip
+            name: psOff-3rd-${{ matrix.config.name }}
+            path: _build/_Release/psOff-3rd-${{ matrix.config.name }}.7z
