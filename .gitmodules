@@ -45,3 +45,6 @@
 [submodule "projects/cpp-ipc"]
 	path = projects/cpp-ipc
 	url = https://github.com/mutouyun/cpp-ipc.git
+[submodule "projects/tracy"]
+	path = projects/tracy
+	url = https://github.com/wolfpld/tracy.git
