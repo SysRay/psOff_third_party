@@ -105,18 +105,6 @@ ExternalProject_Add(libpng_project
 )
 ExternalProject_Add_StepDependencies(libpng_project install zlib_project)
 
-ExternalProject_Add(optick_project
-  SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/optick
-  BINARY_DIR ${BUILDS_DIR}/optick
-  CMAKE_ARGS
-  -DCMAKE_BUILD_TYPE:STRING=Release
-  -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-  -DCMAKE_INSTALL_MESSAGE=${CMAKE_INSTALL_MESSAGE}
-  -DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}
-  -DCMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}
-  -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
-)
-
 ExternalProject_Add(gtest_project
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/googletest
   BINARY_DIR ${BUILDS_DIR}/gtest

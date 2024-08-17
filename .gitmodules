@@ -21,10 +21,6 @@
 	path = projects/magic_enum
 	url = https://github.com/Neargye/magic_enum.git
   ignore = dirty
-[submodule "projects/optick"]
-	path = projects/optick
-	url = https://github.com/bombomby/optick.git
-  ignore = dirty
 [submodule "projects/VulkanMemoryAllocator"]
 	path = projects/VulkanMemoryAllocator
 	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
