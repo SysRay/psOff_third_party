@@ -44,3 +44,6 @@
 [submodule "projects/tracy"]
 	path = projects/tracy
 	url = https://github.com/wolfpld/tracy.git
+[submodule "projects/zydis"]
+	path = projects/zydis
+	url = https://github.com/zyantific/zydis.git
