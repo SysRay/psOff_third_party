@@ -177,7 +177,7 @@ ExternalProject_Add(libzip_project
 )
 ExternalProject_Add_StepDependencies(libzip_project install zlib_project)
 
-set(BOOST_INCLUDE_LIBRARIES "program_options;date_time;interprocess;stacktrace;uuid;beast;signals2;thread;url;asio;dll;serialization;iostreams;process")
+set(BOOST_INCLUDE_LIBRARIES "program_options;date_time;interprocess;stacktrace;uuid;beast;signals2;thread;url;asio;dll;serialization;iostreams;process;lockfree")
 ExternalProject_Add(boost_project
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/boost
   BINARY_DIR ${BUILDS_DIR}/boost
