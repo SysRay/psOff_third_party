@@ -1,0 +1,49 @@
+diff --git a/src/win32/thread.cpp b/src/win32/thread.cpp
+index 000ab877..763f6f61 100644
+--- a/src/win32/thread.cpp
++++ b/src/win32/thread.cpp
+@@ -341,7 +341,7 @@ namespace boost
+         return start_thread_noexcept();
+ #else
+       uintptr_t const new_thread=_beginthreadex(0,static_cast<unsigned int>(attr.get_stack_size()),&thread_start_function,thread_info.get(),
+-                                                CREATE_SUSPENDED | STACK_SIZE_PARAM_IS_A_RESERVATION, &thread_info->id);
++                                                CREATE_SUSPENDED, &thread_info->id);
+       if(!new_thread)
+       {
+         return false;
+@@ -496,7 +496,7 @@ namespace boost
+     bool thread::interruption_requested() const BOOST_NOEXCEPT
+     {
+         detail::thread_data_ptr local_thread_info=(get_thread_info)();
+-        return local_thread_info.get() && (winapi::WaitForSingleObjectEx(local_thread_info->interruption_handle,0,0)==0);
++        return local_thread_info.get() && (winapi::WaitForSingleObjectEx(local_thread_info->interruption_handle,0,TRUE)==0);
+     }
+ 
+ #endif
+@@ -681,7 +681,7 @@ namespace boost
+             {
+                 if(handle_count)
+                 {
+-                    unsigned long const notified_index=winapi::WaitForMultipleObjectsEx(handle_count,handles,false,static_cast<DWORD>(time_left_msec), 0);
++                    unsigned long const notified_index=winapi::WaitForMultipleObjectsEx(handle_count,handles,false,static_cast<DWORD>(time_left_msec), TRUE);
+                     if(notified_index<handle_count)
+                     {
+                         if(notified_index==wait_handle_index)
+@@ -779,7 +779,7 @@ namespace boost
+             {
+                 if(handle_count)
+                 {
+-                    unsigned long const notified_index=winapi::WaitForMultipleObjectsEx(handle_count,handles,false,static_cast<DWORD>(time_left_msec), 0);
++                    unsigned long const notified_index=winapi::WaitForMultipleObjectsEx(handle_count,handles,false,static_cast<DWORD>(time_left_msec), TRUE);
+                     if(notified_index<handle_count)
+                     {
+                         if(notified_index==wait_handle_index)
+@@ -840,7 +840,7 @@ namespace boost
+ 
+         bool interruption_requested() BOOST_NOEXCEPT
+         {
+-            return detail::get_current_thread_data() && (winapi::WaitForSingleObjectEx(detail::get_current_thread_data()->interruption_handle,0,0)==0);
++            return detail::get_current_thread_data() && (winapi::WaitForSingleObjectEx(detail::get_current_thread_data()->interruption_handle,0,TRUE)==0);
+         }
+ #endif
+ 

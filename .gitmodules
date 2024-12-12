@@ -32,15 +32,19 @@
 [submodule "projects/boost"]
 	path = projects/boost
 	url = https://github.com/boostorg/boost.git
+  ignore = dirty
 [submodule "projects/imgui"]
 	path = projects/imgui
 	url = https://github.com/ocornut/imgui.git
+  ignore = dirty
 [submodule "projects/pugixml"]
 	path = projects/pugixml
 	url = https://github.com/zeux/pugixml.git
 [submodule "projects/tracy"]
 	path = projects/tracy
 	url = https://github.com/wolfpld/tracy.git
+  ignore = dirty
 [submodule "projects/zydis"]
 	path = projects/zydis
 	url = https://github.com/zyantific/zydis.git
+  ignore = dirty

@@ -33,7 +33,11 @@ jobs:
 
         - name: Apply Boost Semaphore Patch
           working-directory: projects/boost/libs/interprocess
-          run: git apply ../../../../patches/interprocess_semaphore.patch
+          run: git apply ../../../../patches/boost_interprocess.patch
+
+        - name: Apply Boost Thread Patch
+          working-directory: projects/boost/libs/thread
+          run: git apply ../../../../patches/boost_thread.patch
 
         - name: Detect MSVC
           uses: ilammy/msvc-dev-cmd@v1.13.0
@@ -48,7 +52,7 @@ jobs:
             cache: true
         - name: Run sccache-cache
           uses: mozilla-actions/sccache-action@v0.0.5
-          
+
         - name: Configure
           run: cmake -S. -B_build/_Release -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER_LAUNCHER=sccache -DCMAKE_CXX_COMPILER_LAUNCHER=sccache -DCMAKE_C_COMPILER=${{ matrix.config.compiler }} -DCMAKE_CXX_COMPILER=${{ matrix.config.compiler_cxx }}
 
