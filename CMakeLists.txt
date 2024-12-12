@@ -177,7 +177,7 @@ ExternalProject_Add(libzip_project
 )
 ExternalProject_Add_StepDependencies(libzip_project install zlib_project)
 
-set(BOOST_INCLUDE_LIBRARIES "program_options;date_time;interprocess;stacktrace;uuid;beast;signals2;thread;url;asio;dll;serialization;iostreams;process;lockfree;fiber")
+set(BOOST_INCLUDE_LIBRARIES "program_options;date_time;interprocess;stacktrace;uuid;beast;signals2;thread;url;asio;dll;serialization;iostreams;process;lockfree")
 ExternalProject_Add(boost_project
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/boost
   BINARY_DIR ${BUILDS_DIR}/boost
@@ -213,18 +213,6 @@ endif()
 ExternalProject_Add(pugixml_project
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/pugixml
   BINARY_DIR ${BUILDS_DIR}/pugixml
-  CMAKE_ARGS
-  -DCMAKE_BUILD_TYPE:STRING=Release
-  -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-  -DCMAKE_INSTALL_MESSAGE=${CMAKE_INSTALL_MESSAGE}
-  -DCMAKE_C_FLAGS_RELEASE=${CMAKE_C_FLAGS_RELEASE}
-  -DCMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}
-  -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
-)
-
-ExternalProject_Add(cpp_ipc_project
-  SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/cpp-ipc
-  BINARY_DIR ${BUILDS_DIR}/cpp-ipc
   CMAKE_ARGS
   -DCMAKE_BUILD_TYPE:STRING=Release
   -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
