@@ -35,10 +35,6 @@ jobs:
           working-directory: projects/boost/libs/interprocess
           run: git apply ../../../../patches/interprocess_semaphore.patch
 
-        - name: Apply Vulkan Memory Allocator Patch
-          working-directory: projects/VulkanMemoryAllocator
-          run: git apply ../../patches/vulkan_alloc.patch
-
         - name: Detect MSVC
           uses: ilammy/msvc-dev-cmd@v1.13.0
           if: ${{ matrix.config.name == 'Windows' }}
