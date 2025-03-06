@@ -65,7 +65,7 @@ install(DIRECTORY "projects/p7/Headers/" DESTINATION ${INSTALL_DIR}/include/p7
   FILES_MATCHING PATTERN "*.h"
 )
 
-# SDL2
+# SDL3
 # APPLY SDL PATCH
 ExternalProject_Add(sdl_project
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/SDL
@@ -283,7 +283,7 @@ add_library(imgui STATIC
   ${CMAKE_SOURCE_DIR}/projects/imgui/imgui_demo.cpp
   ${CMAKE_SOURCE_DIR}/projects/imgui/imgui.cpp
 
-  ${CMAKE_SOURCE_DIR}/projects/imgui/backends/imgui_impl_sdl2.cpp
+  ${CMAKE_SOURCE_DIR}/projects/imgui/backends/imgui_impl_sdl3.cpp
   ${CMAKE_SOURCE_DIR}/projects/imgui/backends/imgui_impl_vulkan.cpp
 )
 
@@ -302,7 +302,7 @@ install(FILES
   ${CMAKE_SOURCE_DIR}/projects/imgui/imstb_textedit.h
   ${CMAKE_SOURCE_DIR}/projects/imgui/imstb_truetype.h
 
-  ${CMAKE_SOURCE_DIR}/projects/imgui/backends/imgui_impl_sdl2.h
+  ${CMAKE_SOURCE_DIR}/projects/imgui/backends/imgui_impl_sdl3.h
   ${CMAKE_SOURCE_DIR}/projects/imgui/backends/imgui_impl_vulkan.h
 
   DESTINATION ${INSTALL_DIR}/include/imgui
@@ -310,8 +310,7 @@ install(FILES
 
 target_include_directories(imgui PRIVATE
   ${CMAKE_SOURCE_DIR}/projects/imgui/
-  ${CMAKE_BINARY_DIR}/builds/sdl/include/SDL2
-  ${CMAKE_BINARY_DIR}/builds/sdl/include-config-release/SDL2
+  ${INSTALL_DIR}/include/
   ${Vulkan_INCLUDE_DIR}
 )
 
