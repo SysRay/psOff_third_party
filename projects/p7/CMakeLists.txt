@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
-#project(p7lib)
+project(p7lib)
 
 #>>Build options **********************************************************************
 option(P7_TESTS_BUILD "Build test" OFF)
