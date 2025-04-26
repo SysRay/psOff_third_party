@@ -1,3 +1,38 @@
+diff --git a/include/boost/thread/win32/basic_timed_mutex.hpp b/include/boost/thread/win32/basic_timed_mutex.hpp
+index f0905e66..800c1769 100644
+--- a/include/boost/thread/win32/basic_timed_mutex.hpp
++++ b/include/boost/thread/win32/basic_timed_mutex.hpp
+@@ -82,7 +82,7 @@ namespace boost
+ 
+                     do
+                     {
+-                        if(winapi::WaitForSingleObjectEx(sem,::boost::detail::win32::infinite,0)==0)
++                        if(winapi::WaitForSingleObjectEx(sem,::boost::detail::win32::infinite,1)==0)
+                         {
+                             clear_waiting_and_try_lock(old_count);
+                         }
+@@ -182,7 +182,7 @@ namespace boost
+                         {
+                             d = (std::min)(d, max);
+                         }
+-                        if(winapi::WaitForSingleObjectEx(sem,getMs(d),0)==0)
++                        if(winapi::WaitForSingleObjectEx(sem,getMs(d),1)==0)
+                         {
+                             clear_waiting_and_try_lock(old_count);
+                         }
+diff --git a/include/boost/thread/win32/thread_primitives.hpp b/include/boost/thread/win32/thread_primitives.hpp
+index 391d7375..6a2714be 100644
+--- a/include/boost/thread/win32/thread_primitives.hpp
++++ b/include/boost/thread/win32/thread_primitives.hpp
+@@ -182,7 +182,7 @@ namespace boost
+                 else
+                 {
+ #if BOOST_PLAT_WINDOWS_RUNTIME
+-                    ::boost::winapi::WaitForSingleObjectEx(::boost::winapi::GetCurrentThread(), milliseconds, 0);
++                    ::boost::winapi::WaitForSingleObjectEx(::boost::winapi::GetCurrentThread(), milliseconds, 1);
+ #else
+                     ::boost::winapi::Sleep(milliseconds);
+ #endif
 diff --git a/src/win32/thread.cpp b/src/win32/thread.cpp
 index 000ab877..763f6f61 100644
 --- a/src/win32/thread.cpp
