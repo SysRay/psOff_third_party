@@ -12,8 +12,8 @@ jobs:
           config:
             - name: Windows
               os: windows-latest
-              compiler: 'clang-cl.exe'
-              compiler_cxx: 'clang-cl.exe'
+              compiler: 'clang'
+              compiler_cxx: 'clang'
               preparation: ''
             # - name: Linux
             #   os: ubuntu-24.04

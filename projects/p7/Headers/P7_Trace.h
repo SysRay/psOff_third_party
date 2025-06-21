@@ -42,7 +42,7 @@
 //library print wrong values - please activate this macro  manually  for  your /
 //platform/project                                                             /
 ////////////////////////////////////////////////////////////////////////////////
-//#define P7TRACE_NO_VA_ARG_OPTIMIZATION
+#define P7TRACE_NO_VA_ARG_OPTIMIZATION
 
 //disable va_arg optimization for Linux, too many ways how GCC + Linux uses 
 //stack and registers to store va_arg
