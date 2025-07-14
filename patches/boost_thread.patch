@@ -20,6 +20,46 @@ index f0905e66..800c1769 100644
                          {
                              clear_waiting_and_try_lock(old_count);
                          }
+diff --git a/include/boost/thread/win32/shared_mutex.hpp b/include/boost/thread/win32/shared_mutex.hpp
+index 7f8d2790..1ef50ab2 100644
+--- a/include/boost/thread/win32/shared_mutex.hpp
++++ b/include/boost/thread/win32/shared_mutex.hpp
+@@ -180,7 +180,7 @@ namespace boost
+                     return;
+                 }
+ 
+-                BOOST_VERIFY(winapi::WaitForSingleObjectEx(semaphores[unlock_sem],::boost::detail::win32::infinite,0)==0);
++                BOOST_VERIFY(winapi::WaitForSingleObjectEx(semaphores[unlock_sem],::boost::detail::win32::infinite,1)==0);
+             }
+         }
+ 
+@@ -252,7 +252,7 @@ namespace boost
+                     {
+                         d = (std::min)(d, max);
+                     }
+-                    res=winapi::WaitForSingleObjectEx(semaphores[unlock_sem],getMs(d),0);
++                    res=winapi::WaitForSingleObjectEx(semaphores[unlock_sem],getMs(d),1);
+                     if(res!=detail::win32::timeout) // semaphore released
+                     {
+                         break;
+@@ -672,7 +672,7 @@ namespace boost
+                     return;
+                 }
+ 
+-                BOOST_VERIFY(winapi::WaitForSingleObjectEx(semaphores[unlock_sem],winapi::infinite,0)==0);
++                BOOST_VERIFY(winapi::WaitForSingleObjectEx(semaphores[unlock_sem],winapi::infinite,1)==0);
+             }
+         }
+ 
+@@ -764,7 +764,7 @@ namespace boost
+                 {
+                     if(!last_reader)
+                     {
+-                        BOOST_VERIFY(winapi::WaitForSingleObjectEx(upgrade_sem,detail::win32::infinite,0)==0);
++                        BOOST_VERIFY(winapi::WaitForSingleObjectEx(upgrade_sem,detail::win32::infinite,1)==0);
+                     }
+                     break;
+                 }
 diff --git a/include/boost/thread/win32/thread_primitives.hpp b/include/boost/thread/win32/thread_primitives.hpp
 index 391d7375..6a2714be 100644
 --- a/include/boost/thread/win32/thread_primitives.hpp
