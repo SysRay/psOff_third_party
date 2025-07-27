@@ -122,3 +122,354 @@ index 000ab877..763f6f61 100644
          }
  #endif
  
+diff --git a/include/boost/thread/pthread/condition_variable.hpp b/include/boost/thread/pthread/condition_variable.hpp
+index e3c511f2..48bf602d 100644
+--- a/include/boost/thread/pthread/condition_variable.hpp
++++ b/include/boost/thread/pthread/condition_variable.hpp
+@@ -61,7 +61,8 @@ namespace boost
+         };
+     }
+ 
+-    inline void condition_variable::wait(unique_lock<mutex>& m)
++    template<typename lock_type>
++    void condition_variable::wait(lock_type& m)
+     {
+ #if defined BOOST_THREAD_THROW_IF_PRECONDITION_NOT_SATISFIED
+         if(! m.owns_lock())
+@@ -72,7 +73,7 @@ namespace boost
+         int res=0;
+         {
+ #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
+-            thread_cv_detail::lock_on_exit<unique_lock<mutex> > guard;
++            thread_cv_detail::lock_on_exit<lock_type> guard;
+             detail::interruption_checker check_for_interruption(&internal_mutex,&cond);
+             pthread_mutex_t* the_mutex = &internal_mutex;
+             guard.activate(m);
+@@ -102,8 +103,9 @@ namespace boost
+     // * The timeout has been reached
+     // * Do not assume that a notification has not been received
+     // * Do not assume that the predicate has not been changed
+-    inline bool condition_variable::do_wait_until(
+-                unique_lock<mutex>& m,
++    template<typename lock_type>
++    bool condition_variable::do_wait_until(
++                lock_type& m,
+                 detail::internal_platform_timepoint const &timeout)
+     {
+ #if defined BOOST_THREAD_THROW_IF_PRECONDITION_NOT_SATISFIED
+@@ -115,7 +117,7 @@ namespace boost
+         int cond_res;
+         {
+ #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
+-            thread_cv_detail::lock_on_exit<unique_lock<mutex> > guard;
++            thread_cv_detail::lock_on_exit<lock_type> guard;
+             detail::interruption_checker check_for_interruption(&internal_mutex,&cond);
+             pthread_mutex_t* the_mutex = &internal_mutex;
+             guard.activate(m);
+diff --git a/include/boost/thread/pthread/condition_variable_fwd.hpp b/include/boost/thread/pthread/condition_variable_fwd.hpp
+index f5963486..0d11c4d8 100644
+--- a/include/boost/thread/pthread/condition_variable_fwd.hpp
++++ b/include/boost/thread/pthread/condition_variable_fwd.hpp
+@@ -44,8 +44,9 @@ namespace boost
+     public:
+     //private: // used by boost::thread::try_join_until
+ 
++        template<typename lock_type>
+         bool do_wait_until(
+-            unique_lock<mutex>& lock,
++            lock_type& lock,
+             detail::internal_platform_timepoint const &timeout);
+ 
+     public:
+@@ -83,10 +84,11 @@ namespace boost
+             BOOST_VERIFY(!posix::pthread_cond_destroy(&cond));
+         }
+ 
+-        void wait(unique_lock<mutex>& m);
++        template<typename lock_type>
++        void wait(lock_type& m);
+ 
+-        template<typename predicate_type>
+-        void wait(unique_lock<mutex>& m,predicate_type pred)
++        template<typename lock_type, typename predicate_type>
++        void wait(lock_type& m,predicate_type pred)
+         {
+             while (!pred())
+             {
+@@ -95,8 +97,9 @@ namespace boost
+         }
+ 
+ #if defined BOOST_THREAD_USES_DATETIME
++        template<typename lock_type>
+         bool timed_wait(
+-            unique_lock<mutex>& m,
++            lock_type& m,
+             boost::system_time const& abs_time)
+         {
+ #if defined BOOST_THREAD_WAIT_BUG
+@@ -119,16 +122,18 @@ namespace boost
+             return do_wait_until(m, ts);
+ #endif
+         }
++
++        template<typename lock_type>
+         bool timed_wait(
+-            unique_lock<mutex>& m,
++            lock_type& m,
+             ::boost::xtime const& abs_time)
+         {
+             return timed_wait(m,system_time(abs_time));
+         }
+ 
+-        template<typename duration_type>
++        template<typename lock_type, typename duration_type>
+         bool timed_wait(
+-            unique_lock<mutex>& m,
++            lock_type& m,
+             duration_type const& wait_duration)
+         {
+             if (wait_duration.is_pos_infinity())
+@@ -157,9 +162,9 @@ namespace boost
+ #endif
+         }
+ 
+-        template<typename predicate_type>
++        template<typename lock_type, typename predicate_type>
+         bool timed_wait(
+-            unique_lock<mutex>& m,
++            lock_type& m,
+             boost::system_time const& abs_time,predicate_type pred)
+         {
+ #if defined BOOST_THREAD_WAIT_BUG
+@@ -184,17 +189,17 @@ namespace boost
+             return pred();
+         }
+ 
+-        template<typename predicate_type>
++        template<typename lock_type, typename predicate_type>
+         bool timed_wait(
+-            unique_lock<mutex>& m,
++            lock_type& m,
+             ::boost::xtime const& abs_time,predicate_type pred)
+         {
+             return timed_wait(m,system_time(abs_time),pred);
+         }
+ 
+-        template<typename duration_type,typename predicate_type>
++        template<typename lock_type, typename duration_type,typename predicate_type>
+         bool timed_wait(
+-            unique_lock<mutex>& m,
++            lock_type& m,
+             duration_type const& wait_duration,predicate_type pred)
+         {
+             if (wait_duration.is_pos_infinity())
+@@ -235,10 +240,10 @@ namespace boost
+ 
+ #ifdef BOOST_THREAD_USES_CHRONO
+ 
+-        template <class Duration>
++        template <typename lock_type, class Duration>
+         cv_status
+         wait_until(
+-                unique_lock<mutex>& lock,
++                lock_type& lock,
+                 const chrono::time_point<detail::internal_chrono_clock, Duration>& t)
+         {
+             const detail::internal_platform_timepoint ts(t);
+@@ -246,10 +251,10 @@ namespace boost
+             else return cv_status::timeout;
+         }
+ 
+-        template <class Clock, class Duration>
++        template <typename lock_type, class Clock, class Duration>
+         cv_status
+         wait_until(
+-                unique_lock<mutex>& lock,
++                lock_type& lock,
+                 const chrono::time_point<Clock, Duration>& t)
+         {
+             // The system time may jump while this function is waiting. To compensate for this and time
+@@ -266,19 +271,19 @@ namespace boost
+             else return cv_status::timeout;
+         }
+ 
+-        template <class Rep, class Period>
++        template <typename lock_type, class Rep, class Period>
+         cv_status
+         wait_for(
+-                unique_lock<mutex>& lock,
++                lock_type& lock,
+                 const chrono::duration<Rep, Period>& d)
+         {
+             return wait_until(lock, chrono::steady_clock::now() + d);
+         }
+ 
+-        template <class Duration, class Predicate>
++        template <typename lock_type, class Duration, class Predicate>
+         bool
+         wait_until(
+-                unique_lock<mutex>& lock,
++                lock_type& lock,
+                 const chrono::time_point<detail::internal_chrono_clock, Duration>& t,
+                 Predicate pred)
+         {
+@@ -290,10 +295,10 @@ namespace boost
+             return pred();
+         }
+ 
+-        template <class Clock, class Duration, class Predicate>
++        template <typename lock_type, class Clock, class Duration, class Predicate>
+         bool
+         wait_until(
+-                unique_lock<mutex>& lock,
++                lock_type& lock,
+                 const chrono::time_point<Clock, Duration>& t,
+                 Predicate pred)
+         {
+@@ -311,10 +316,10 @@ namespace boost
+             return pred();
+         }
+ 
+-        template <class Rep, class Period, class Predicate>
++        template <typename lock_type, class Rep, class Period, class Predicate>
+         bool
+         wait_for(
+-                unique_lock<mutex>& lock,
++                lock_type& lock,
+                 const chrono::duration<Rep, Period>& d,
+                 Predicate pred)
+         {
+@@ -333,7 +338,8 @@ namespace boost
+         void notify_all() BOOST_NOEXCEPT;
+     };
+ 
+-    BOOST_THREAD_DECL void notify_all_at_thread_exit(condition_variable& cond, unique_lock<mutex> lk);
++    template<typename lock_type>
++    BOOST_THREAD_DECL void notify_all_at_thread_exit(condition_variable& cond, lock_type lk);
+ }
+ 
+ #include <boost/config/abi_suffix.hpp>
+diff --git a/include/boost/thread/win32/basic_timed_mutex.hpp b/include/boost/thread/win32/basic_timed_mutex.hpp
+index f0905e66..800c1769 100644
+--- a/include/boost/thread/win32/basic_timed_mutex.hpp
++++ b/include/boost/thread/win32/basic_timed_mutex.hpp
+@@ -82,7 +82,7 @@ namespace boost
+ 
+                     do
+                     {
+-                        if(winapi::WaitForSingleObjectEx(sem,::boost::detail::win32::infinite,0)==0)
++                        if(winapi::WaitForSingleObjectEx(sem,::boost::detail::win32::infinite,1)==0)
+                         {
+                             clear_waiting_and_try_lock(old_count);
+                         }
+@@ -182,7 +182,7 @@ namespace boost
+                         {
+                             d = (std::min)(d, max);
+                         }
+-                        if(winapi::WaitForSingleObjectEx(sem,getMs(d),0)==0)
++                        if(winapi::WaitForSingleObjectEx(sem,getMs(d),1)==0)
+                         {
+                             clear_waiting_and_try_lock(old_count);
+                         }
+diff --git a/include/boost/thread/win32/shared_mutex.hpp b/include/boost/thread/win32/shared_mutex.hpp
+index 7f8d2790..1ef50ab2 100644
+--- a/include/boost/thread/win32/shared_mutex.hpp
++++ b/include/boost/thread/win32/shared_mutex.hpp
+@@ -180,7 +180,7 @@ namespace boost
+                     return;
+                 }
+ 
+-                BOOST_VERIFY(winapi::WaitForSingleObjectEx(semaphores[unlock_sem],::boost::detail::win32::infinite,0)==0);
++                BOOST_VERIFY(winapi::WaitForSingleObjectEx(semaphores[unlock_sem],::boost::detail::win32::infinite,1)==0);
+             }
+         }
+ 
+@@ -252,7 +252,7 @@ namespace boost
+                     {
+                         d = (std::min)(d, max);
+                     }
+-                    res=winapi::WaitForSingleObjectEx(semaphores[unlock_sem],getMs(d),0);
++                    res=winapi::WaitForSingleObjectEx(semaphores[unlock_sem],getMs(d),1);
+                     if(res!=detail::win32::timeout) // semaphore released
+                     {
+                         break;
+@@ -672,7 +672,7 @@ namespace boost
+                     return;
+                 }
+ 
+-                BOOST_VERIFY(winapi::WaitForSingleObjectEx(semaphores[unlock_sem],winapi::infinite,0)==0);
++                BOOST_VERIFY(winapi::WaitForSingleObjectEx(semaphores[unlock_sem],winapi::infinite,1)==0);
+             }
+         }
+ 
+@@ -764,7 +764,7 @@ namespace boost
+                 {
+                     if(!last_reader)
+                     {
+-                        BOOST_VERIFY(winapi::WaitForSingleObjectEx(upgrade_sem,detail::win32::infinite,0)==0);
++                        BOOST_VERIFY(winapi::WaitForSingleObjectEx(upgrade_sem,detail::win32::infinite,1)==0);
+                     }
+                     break;
+                 }
+diff --git a/include/boost/thread/win32/thread_primitives.hpp b/include/boost/thread/win32/thread_primitives.hpp
+index 391d7375..6a2714be 100644
+--- a/include/boost/thread/win32/thread_primitives.hpp
++++ b/include/boost/thread/win32/thread_primitives.hpp
+@@ -182,7 +182,7 @@ namespace boost
+                 else
+                 {
+ #if BOOST_PLAT_WINDOWS_RUNTIME
+-                    ::boost::winapi::WaitForSingleObjectEx(::boost::winapi::GetCurrentThread(), milliseconds, 0);
++                    ::boost::winapi::WaitForSingleObjectEx(::boost::winapi::GetCurrentThread(), milliseconds, 1);
+ #else
+                     ::boost::winapi::Sleep(milliseconds);
+ #endif
+diff --git a/src/win32/thread.cpp b/src/win32/thread.cpp
+index 000ab877..763f6f61 100644
+--- a/src/win32/thread.cpp
++++ b/src/win32/thread.cpp
+@@ -341,7 +341,7 @@ namespace boost
+         return start_thread_noexcept();
+ #else
+       uintptr_t const new_thread=_beginthreadex(0,static_cast<unsigned int>(attr.get_stack_size()),&thread_start_function,thread_info.get(),
+-                                                CREATE_SUSPENDED | STACK_SIZE_PARAM_IS_A_RESERVATION, &thread_info->id);
++                                                CREATE_SUSPENDED, &thread_info->id);
+       if(!new_thread)
+       {
+         return false;
+@@ -496,7 +496,7 @@ namespace boost
+     bool thread::interruption_requested() const BOOST_NOEXCEPT
+     {
+         detail::thread_data_ptr local_thread_info=(get_thread_info)();
+-        return local_thread_info.get() && (winapi::WaitForSingleObjectEx(local_thread_info->interruption_handle,0,0)==0);
++        return local_thread_info.get() && (winapi::WaitForSingleObjectEx(local_thread_info->interruption_handle,0,TRUE)==0);
+     }
+ 
+ #endif
+@@ -681,7 +681,7 @@ namespace boost
+             {
+                 if(handle_count)
+                 {
+-                    unsigned long const notified_index=winapi::WaitForMultipleObjectsEx(handle_count,handles,false,static_cast<DWORD>(time_left_msec), 0);
++                    unsigned long const notified_index=winapi::WaitForMultipleObjectsEx(handle_count,handles,false,static_cast<DWORD>(time_left_msec), TRUE);
+                     if(notified_index<handle_count)
+                     {
+                         if(notified_index==wait_handle_index)
+@@ -779,7 +779,7 @@ namespace boost
+             {
+                 if(handle_count)
+                 {
+-                    unsigned long const notified_index=winapi::WaitForMultipleObjectsEx(handle_count,handles,false,static_cast<DWORD>(time_left_msec), 0);
++                    unsigned long const notified_index=winapi::WaitForMultipleObjectsEx(handle_count,handles,false,static_cast<DWORD>(time_left_msec), TRUE);
+                     if(notified_index<handle_count)
+                     {
+                         if(notified_index==wait_handle_index)
+@@ -840,7 +840,7 @@ namespace boost
+ 
+         bool interruption_requested() BOOST_NOEXCEPT
+         {
+-            return detail::get_current_thread_data() && (winapi::WaitForSingleObjectEx(detail::get_current_thread_data()->interruption_handle,0,0)==0);
++            return detail::get_current_thread_data() && (winapi::WaitForSingleObjectEx(detail::get_current_thread_data()->interruption_handle,0,TRUE)==0);
+         }
+ #endif
+ 
