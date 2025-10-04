@@ -15,11 +15,11 @@ jobs:
               compiler: 'clang'
               compiler_cxx: 'clang'
               preparation: ''
-            # - name: Linux
-            #   os: ubuntu-24.04
-            #   compiler: 'clang-17'
-            #   compiler_cxx: 'clang++-17'
-            #   preparation: 'sudo apt update -y && sudo apt install -y ninja-build'
+            - name: Linux
+              os: ubuntu-latest
+              compiler: 'clang-19'
+              compiler_cxx: 'clang++-19'
+              preparation: 'sudo apt update -y && sudo apt install -y ninja-build'
 
       runs-on: ${{ matrix.config.os }}
       steps:
