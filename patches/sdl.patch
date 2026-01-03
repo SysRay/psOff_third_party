@@ -1,0 +1,12 @@
+diff --git a/src/cpuinfo/SDL_cpuinfo.c b/src/cpuinfo/SDL_cpuinfo.c
+index 27483fbc6..17272a893 100644
+--- a/src/cpuinfo/SDL_cpuinfo.c
++++ b/src/cpuinfo/SDL_cpuinfo.c
+@@ -59,6 +59,7 @@
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <elf.h>
++#include <stdio.h>
+ 
+ // #include <asm/hwcap.h>
+ #ifndef AT_HWCAP
