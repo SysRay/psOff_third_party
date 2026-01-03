@@ -35,10 +35,6 @@ jobs:
           working-directory: projects/boost/libs/thread
           run: git apply ../../../../patches/boost_thread.patch
 
-        - name: Apply Zydis Patch
-          working-directory: projects/zydis/dependencies/zycore
-          run: git apply ../../../../patches/zycore.patch
-
         - name: Detect MSVC
           uses: ilammy/msvc-dev-cmd@v1.13.0
           if: ${{ matrix.config.name == 'Windows' }}
