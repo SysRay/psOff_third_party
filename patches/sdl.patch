@@ -1,12 +1,13 @@
 diff --git a/src/cpuinfo/SDL_cpuinfo.c b/src/cpuinfo/SDL_cpuinfo.c
-index 27483fbc6..17272a893 100644
+index 27483fbc6..5f06d75ec 100644
 --- a/src/cpuinfo/SDL_cpuinfo.c
 +++ b/src/cpuinfo/SDL_cpuinfo.c
-@@ -59,6 +59,7 @@
- #include <sys/stat.h>
- #include <fcntl.h>
- #include <elf.h>
-+#include <stdio.h>
+@@ -25,6 +25,8 @@
  
- // #include <asm/hwcap.h>
- #ifndef AT_HWCAP
+ #if defined(SDL_PLATFORM_WINDOWS)
+ #include "../core/windows/SDL_windows.h"
++#elif defined(SDL_PLATFORM_LINUX)
++#include <stdio.h>
+ #endif
+ 
+ // CPU feature detection for SDL
