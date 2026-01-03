@@ -39,10 +39,6 @@ jobs:
           working-directory: projects/zydis/dependencies/zycore
           run: git apply ../../../../patches/zycore.patch
 
-        - name: Apply SDL Patch
-          working-directory: projects/SDL
-          run: git apply ../../patches/sdl.patch
-
         - name: Detect MSVC
           uses: ilammy/msvc-dev-cmd@v1.13.0
           if: ${{ matrix.config.name == 'Windows' }}
