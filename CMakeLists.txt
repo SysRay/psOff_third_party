@@ -247,34 +247,6 @@ ExternalProject_Add(tracy_project
   -DTRACY_NO_CRASH_HANDLER:BOOL=ON,
 )
 
-install(CODE [[
-    set(bin_dir "${CMAKE_BINARY_DIR}/install/bin")
-    set(lib_dir "${CMAKE_BINARY_DIR}/install/lib")
-    set(config_subdir "RelWithDebInfo")
-
-    foreach(base_dir IN ITEMS "${bin_dir}" "${lib_dir}")
-        set(sub_dir "${base_dir}/${config_subdir}")
-
-        if(EXISTS "${sub_dir}")
-            file(GLOB sub_contents "${sub_dir}/*")
-            foreach(item IN LISTS sub_contents)
-                get_filename_component(item_name "${item}" NAME)
-                set(target_path "${base_dir}/${item_name}")
-
-                # Move the item to the parent directory (overwrites if exists, but unlikely)
-                file(RENAME "${item}" "${target_path}")
-                message(STATUS "Moved ${item_name} from ${config_subdir}/ to ${base_dir}")
-            endforeach()
-
-            # Clean up the now-empty subdirectory
-            file(GLOB remaining "${sub_dir}/*")
-            if(NOT remaining)
-                file(REMOVE_RECURSE "${sub_dir}")
-            endif()
-        endif()
-    endforeach()
-]])
-
 add_library(imgui STATIC
   ${CMAKE_SOURCE_DIR}/projects/imgui/imgui_draw.cpp
   ${CMAKE_SOURCE_DIR}/projects/imgui/imgui_tables.cpp
