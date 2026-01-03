@@ -10,9 +10,6 @@
 	path = projects/SDL
 	url = https://github.com/libsdl-org/SDL.git
   ignore = dirty
-[submodule "projects/googletest"]
-	path = projects/googletest
-	url = https://github.com/google/googletest.git
 [submodule "projects/libpng"]
 	path = projects/libpng
 	url = https://github.com/pnggroup/libpng

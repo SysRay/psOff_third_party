@@ -42,8 +42,6 @@ ExternalProject_Add(zlib_project
   -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
 )
 
-install(FILES "projects/fff/fff.h" DESTINATION ${INSTALL_DIR}/include/fff/)
-
 # SDL3
 # APPLY SDL PATCH
 ExternalProject_Add(sdl_project
@@ -88,21 +86,6 @@ ExternalProject_Add(libpng_project
 )
 ExternalProject_Add_StepDependencies(libpng_project install zlib_project)
 
-ExternalProject_Add(gtest_project
-  SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/googletest
-  BINARY_DIR ${BUILDS_DIR}/gtest
-  CMAKE_ARGS
-  -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo
-  -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-  -DCMAKE_INSTALL_MESSAGE=${CMAKE_INSTALL_MESSAGE}
-  -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
-  -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
-  -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-  -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-
-  -Dgtest_force_shared_crt:BOOL=ON
-)
-
 install(DIRECTORY "projects/ffmpeg/include/" DESTINATION "${INSTALL_DIR}/include")
 
 install(DIRECTORY "projects/openssl/bin/" DESTINATION "${INSTALL_DIR}/bin")
@@ -115,6 +98,10 @@ install(DIRECTORY "projects/nlohmann/" DESTINATION ${INSTALL_DIR}/include/nlohma
 
 install(DIRECTORY "projects/magic_enum/include/" DESTINATION ${INSTALL_DIR}/include)
 install(DIRECTORY "projects/alpaca/include/" DESTINATION ${INSTALL_DIR}/include)
+install(DIRECTORY "projects/fixed_containers" DESTINATION "${INSTALL_DIR}/include")
+install(DIRECTORY "projects/incbin" DESTINATION "${INSTALL_DIR}/include")
+install(DIRECTORY "projects/emhash" DESTINATION "${INSTALL_DIR}/include")
+install(DIRECTORY "projects/renderdoc" DESTINATION "${INSTALL_DIR}/include")
 
 ExternalProject_Add(vma_project
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/VulkanMemoryAllocator
@@ -244,6 +231,35 @@ ExternalProject_Add(tracy_project
   -DTRACY_NO_FRAME_IMAGE:BOOL=ON,
   -DTRACY_NO_CRASH_HANDLER:BOOL=ON,
 )
+
+install(CODE [[
+    set(bin_dir "${CMAKE_BINARY_DIR}/install/bin")
+    set(lib_dir "${CMAKE_BINARY_DIR}/install/lib")
+    set(config_subdir "RelWithDebInfo")
+
+    # Only apply if a subdir is specified (i.e., not Release)
+      foreach(base_dir IN ITEMS "${bin_dir}" "${lib_dir}")
+          set(sub_dir "${base_dir}/${config_subdir}")
+
+          if(EXISTS "${sub_dir}")
+              file(GLOB sub_contents "${sub_dir}/*")
+              foreach(item IN LISTS sub_contents)
+                  get_filename_component(item_name "${item}" NAME)
+                  set(target_path "${base_dir}/${item_name}")
+
+                  # Move the item to the parent directory (overwrites if exists, but unlikely)
+                  file(RENAME "${item}" "${target_path}")
+                  message(STATUS "Moved ${item_name} from ${config_subdir}/ to ${base_dir}")
+              endforeach()
+
+              # Clean up the now-empty subdirectory
+              file(GLOB remaining "${sub_dir}/*")
+              if(NOT remaining)
+                  file(REMOVE_RECURSE "${sub_dir}")
+              endif()
+          endif()
+      endforeach()
+]])
 
 add_library(imgui STATIC
   ${CMAKE_SOURCE_DIR}/projects/imgui/imgui_draw.cpp
