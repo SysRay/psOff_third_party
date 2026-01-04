@@ -56,34 +56,6 @@ jobs:
         - name: Install
           run: cmake --install _build/_Release
 
-        - name: Fixup Tracy paths
-          shell: bash
-          run: |
-            INSTALL_PREFIX="_build/_Release/install"
-            CONFIG_SUBDIR="RelWithDebInfo"
-
-            BIN_DIR="${INSTALL_PREFIX}/bin"
-            LIB_DIR="${INSTALL_PREFIX}/lib"
-
-            for BASE_DIR in "$BIN_DIR" "$LIB_DIR"; do
-              SUB_DIR="${BASE_DIR}/${CONFIG_SUBDIR}"
-
-              if [ -d "$SUB_DIR" ]; then
-                for ITEM in "$SUB_DIR"/*; do
-                  if [ -e "$ITEM" ]; then
-                    ITEM_NAME=$(basename "$ITEM")
-                    TARGET_PATH="${BASE_DIR}/${ITEM_NAME}"
-                    mv -f "$ITEM" "$TARGET_PATH"
-                    echo "Moved $ITEM_NAME from $SUB_DIR/ to flat $BASE_DIR"
-                  fi
-                done
-
-                if [ -z "$(ls -A "$SUB_DIR")" ]; then
-                  rm -rf "$SUB_DIR"
-                fi
-              fi
-            done
-
         - name: Zip it up
           working-directory: _build/_Release
           run: |
