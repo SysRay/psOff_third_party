@@ -10,16 +10,30 @@ jobs:
         fail-fast: false
         matrix:
           config:
-            - name: Windows
+            - name: Windows (Release)
               os: windows-latest
               compiler: 'clang'
               compiler_cxx: 'clang'
               preparation: ''
-            - name: Linux
+              build_type: Release
+            - name: Linux (Release)
               os: ubuntu-latest
               compiler: 'clang-18'
               compiler_cxx: 'clang++-18'
               preparation: 'sudo apt update -y && sudo apt install -y ninja-build gnome-desktop-testing libasound2-dev libpulse-dev libaudio-dev libjack-dev libsndio-dev libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev libxtst-dev libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev libpipewire-0.3-dev libwayland-dev libdecor-0-dev liburing-dev'
+              build_type: Release
+            - name: Windows (Debug)
+              os: windows-latest
+              compiler: 'clang'
+              compiler_cxx: 'clang'
+              preparation: ''
+              build_type: Debug
+            - name: Linux (Debug)
+              os: ubuntu-latest
+              compiler: 'clang-18'
+              compiler_cxx: 'clang++-18'
+              preparation: 'sudo apt update -y && sudo apt install -y ninja-build gnome-desktop-testing libasound2-dev libpulse-dev libaudio-dev libjack-dev libsndio-dev libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev libxtst-dev libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev libpipewire-0.3-dev libwayland-dev libdecor-0-dev liburing-dev'
+              build_type: Debug
 
       runs-on: ${{ matrix.config.os }}
       steps:
@@ -48,7 +62,7 @@ jobs:
             cache: true
 
         - name: Configure
-          run: cmake -S. -B_build/_Release -GNinja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=${{ matrix.config.compiler }} -DCMAKE_CXX_COMPILER=${{ matrix.config.compiler_cxx }}
+          run: cmake -S. -B_build/_Release -GNinja -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} -DCMAKE_C_COMPILER=${{ matrix.config.compiler }} -DCMAKE_CXX_COMPILER=${{ matrix.config.compiler_cxx }}
 
         - name: Build
           run: cmake --build _build/_Release -j4
@@ -59,10 +73,10 @@ jobs:
         - name: Zip it up
           working-directory: _build/_Release
           run: |
-            7z a psOff-3rd-${{ matrix.config.name }}.7z -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on ./install/* -xr!licenses
+            7z a psOff-3rd-${{ matrix.config.name }}-${{ matrix.config.build_type }}.7z -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on ./install/* -xr!licenses
 
         - name: Upload artifacts
           uses: actions/upload-artifact@v4
           with:
-            name: psOff-3rd-${{ matrix.config.name }}
-            path: _build/_Release/psOff-3rd-${{ matrix.config.name }}.7z
+            name: psOff-3rd-${{ matrix.config.name }}-${{ matrix.config.build_type }}
+            path: _build/_Release/psOff-3rd-${{ matrix.config.name }}-${{ matrix.config.build_type }}.7z

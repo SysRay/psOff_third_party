@@ -4,12 +4,7 @@
   "cmake.sourceDirectory": "${workspaceFolder}",
   "cmake.buildDirectory": "${workspaceFolder}/_build/_Release",
   "cmake.configureArgs": [],
-  "cmake.configureSettings": {
-    "CMAKE_BUILD_TYPE": "Release",
-    "CMAKE_INSTALL_PREFIX": "${workspaceFolder}/_build/_Install",
-    // "CMAKE_C_COMPILER": "clang-17",
-    // "CMAKE_CXX_COMPILER": "clang++-17"
-  },
+  "cmake.configureSettings": {},
   "C_Cpp.formatting": "clangFormat",
   "C_Cpp.clang_format_style": "file:${workspaceRoot}/.clang-format",
   "C_Cpp.clang_format_fallbackStyle": "LLVM",
