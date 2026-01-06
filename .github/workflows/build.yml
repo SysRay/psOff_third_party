@@ -5,30 +5,30 @@ on:
 
 jobs:
   build:
-      name: third_party
+      name: ${{ matrix.config.build_type }} build for ${{ matrix.config.name }}
       strategy:
         fail-fast: false
         matrix:
           config:
-            - name: Windows (Release)
+            - name: Windows
               os: windows-latest
               compiler: 'clang'
               compiler_cxx: 'clang'
               preparation: ''
               build_type: Release
-            - name: Linux (Release)
+            - name: Linux
               os: ubuntu-latest
               compiler: 'clang-18'
               compiler_cxx: 'clang++-18'
               preparation: 'sudo apt update -y && sudo apt install -y ninja-build gnome-desktop-testing libasound2-dev libpulse-dev libaudio-dev libjack-dev libsndio-dev libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev libxi-dev libxss-dev libxtst-dev libxkbcommon-dev libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev libdbus-1-dev libibus-1.0-dev libudev-dev libpipewire-0.3-dev libwayland-dev libdecor-0-dev liburing-dev'
               build_type: Release
-            - name: Windows (Debug)
+            - name: Windows
               os: windows-latest
               compiler: 'clang'
               compiler_cxx: 'clang'
               preparation: ''
               build_type: Debug
-            - name: Linux (Debug)
+            - name: Linux
               os: ubuntu-latest
               compiler: 'clang-18'
               compiler_cxx: 'clang++-18'
