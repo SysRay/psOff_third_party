@@ -26,7 +26,7 @@ set(CMAKE_INSTALL_MESSAGE LAZY)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 set(CMAKE_WINDOWS_SYMBOL_VISIBILITY_IN_STATIC_LIBRARIES OFF)
 
-find_package(Vulkan REQUIRED)
+find_package(Vulkan 1.4 REQUIRED)
 
 ExternalProject_Add(zlib_project
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/zlib
