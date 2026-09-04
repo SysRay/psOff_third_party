@@ -38,7 +38,7 @@ jobs:
       runs-on: ${{ matrix.config.os }}
       steps:
         - name: Checkout repository
-          uses: actions/checkout@v4
+          uses: actions/checkout@v7
           with:
             submodules: recursive
 
@@ -77,7 +77,7 @@ jobs:
             7z a psOff-3rd-${{ matrix.config.name }}-${{ matrix.config.build_type }}.7z -t7z -m0=lzma -mx=9 -mfb=64 -md=32m -ms=on ./install/* -xr!licenses
 
         - name: Upload artifacts
-          uses: actions/upload-artifact@v4
+          uses: actions/upload-artifact@v7
           with:
             name: psOff-3rd-${{ matrix.config.name }}-${{ matrix.config.build_type }}
             path: _build/_Release/psOff-3rd-${{ matrix.config.name }}-${{ matrix.config.build_type }}.7z
