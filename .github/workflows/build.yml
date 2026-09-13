@@ -42,6 +42,10 @@ jobs:
           with:
             submodules: recursive
 
+        - name: Prepare boost
+          shell: bash
+          run: ./prepare_boost.sh
+
         - name: Run preparation command
           run: ${{ matrix.config.preparation }}
 

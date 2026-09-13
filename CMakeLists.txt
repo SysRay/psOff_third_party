@@ -1,5 +1,20 @@
 cmake_minimum_required(VERSION 3.24)
 include(ExternalProject)
+include(FetchContent)
+
+# Versions of third party libraries
+set(TPV_ZLIB_VER "v1.3.1")
+set(TPV_ZIP_VER "v1.11.4")
+set(TPV_SDL_VER "release-3.4.16")
+set(TPV_PNG_VER "v1.6.58")
+set(TPV_VMA_VER "v3.4.0")
+set(TPV_PUGIXML_VER "v1.16")
+set(TPV_ZYCORE_VER "v1.5.1")
+set(TPV_ZYDIS_VER "v4.1.1")
+set(TPV_TRACY_VER "v0.14.1")
+set(TPV_MAGICENUM_VER "v0.9.8")
+set(TPV_IMGUI_VER "v1.92.9b")
+###################################
 
 set(ProjectName psOff_third_party)
 project(${ProjectName} VERSION 0.0.1)
@@ -29,6 +44,9 @@ set(CMAKE_WINDOWS_SYMBOL_VISIBILITY_IN_STATIC_LIBRARIES OFF)
 find_package(Vulkan 1.4 REQUIRED)
 
 ExternalProject_Add(zlib_project
+  GIT_REPOSITORY https://github.com/madler/zlib.git
+  GIT_TAG ${TPV_ZLIB_VER}
+  GIT_SHALLOW true
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/zlib
   BINARY_DIR ${BUILDS_DIR}/zlib
   CMAKE_ARGS
@@ -45,6 +63,9 @@ ExternalProject_Add(zlib_project
 # SDL3
 # APPLY SDL PATCH
 ExternalProject_Add(sdl_project
+  GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+  GIT_TAG ${TPV_SDL_VER}
+  GIT_SHALLOW true
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/SDL
   BINARY_DIR ${BUILDS_DIR}/sdl
   CMAKE_ARGS
@@ -74,6 +95,9 @@ ExternalProject_Add(sdl_project
 )
 
 ExternalProject_Add(libpng_project
+  GIT_REPOSITORY https://github.com/pnggroup/libpng.git
+  GIT_TAG ${TPV_PNG_VER}
+  GIT_SHALLOW true
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/libpng
   BINARY_DIR ${BUILDS_DIR}/libpng
   CMAKE_ARGS
@@ -105,7 +129,6 @@ install(DIRECTORY "projects/nlohmann/" DESTINATION ${INSTALL_DIR}/include/nlohma
   FILES_MATCHING PATTERN "*.hpp"
 )
 
-install(DIRECTORY "projects/magic_enum/include/" DESTINATION ${INSTALL_DIR}/include)
 install(DIRECTORY "projects/alpaca/include/" DESTINATION ${INSTALL_DIR}/include)
 install(DIRECTORY "projects/fixed_containers" DESTINATION "${INSTALL_DIR}/include")
 install(DIRECTORY "projects/incbin" DESTINATION "${INSTALL_DIR}/include")
@@ -113,6 +136,9 @@ install(DIRECTORY "projects/emhash" DESTINATION "${INSTALL_DIR}/include")
 install(DIRECTORY "projects/renderdoc" DESTINATION "${INSTALL_DIR}/include")
 
 ExternalProject_Add(vma_project
+  GIT_REPOSITORY https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git
+  GIT_TAG ${TPV_VMA_VER}
+  GIT_SHALLOW true
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/VulkanMemoryAllocator
   BINARY_DIR ${BUILDS_DIR}/vma
   CMAKE_ARGS
@@ -129,6 +155,9 @@ ExternalProject_Add(vma_project
 install(DIRECTORY "projects/xxhash/include/" DESTINATION ${INSTALL_DIR}/include)
 
 ExternalProject_Add(libzip_project
+  GIT_REPOSITORY https://github.com/nih-at/libzip.git
+  GIT_TAG ${TPV_ZIP_VER}
+  GIT_SHALLOW true
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/libzip
   BINARY_DIR ${BUILDS_DIR}/libzip
   CMAKE_ARGS
@@ -157,6 +186,7 @@ ExternalProject_Add(libzip_project
 )
 ExternalProject_Add_StepDependencies(libzip_project install zlib_project)
 
+# Should be set up with ./prepare_boost.sh first!
 set(BOOST_INCLUDE_LIBRARIES "program_options;date_time;interprocess;stacktrace;uuid;beast;signals2;thread;url;asio;dll;serialization;iostreams;process;lockfree;icl")
 ExternalProject_Add(boost_project
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/boost
@@ -179,6 +209,9 @@ ExternalProject_Add(boost_project
 )
 
 ExternalProject_Add(pugixml_project
+  GIT_REPOSITORY https://github.com/zeux/pugixml.git
+  GIT_TAG ${TPV_PUGIXML_VER}
+  GIT_SHALLOW true
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/pugixml
   BINARY_DIR ${BUILDS_DIR}/pugixml
   CMAKE_ARGS
@@ -192,7 +225,28 @@ ExternalProject_Add(pugixml_project
   -DCMAKE_PREFIX_PATH:STRING=${INSTALL_DIR}
 )
 
+set(ZYCORE_PATH "${CMAKE_SOURCE_DIR}/projects/zycore")
+ExternalProject_Add(zydis_core_project
+  GIT_REPOSITORY https://github.com/zyantific/zycore-c.git
+  GIT_TAG ${TPV_ZYCORE_VER}
+  SOURCE_DIR ${ZYCORE_PATH}
+  BINARY_DIR ${BUILDS_DIR}/zydis_core
+  CMAKE_ARGS
+  -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+  -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+  -DCMAKE_INSTALL_MESSAGE=${CMAKE_INSTALL_MESSAGE}
+  -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
+  -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+  -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
+  -DCMAKE_PREFIX_PATH:STRING=${INSTALL_DIR}
+)
+
 ExternalProject_Add(zydis_project
+  GIT_REPOSITORY https://github.com/zyantific/zydis.git
+  GIT_TAG ${TPV_ZYDIS_VER}
+  GIT_SHALLOW true
+  GIT_SUBMODULES ""
+  GIT_SUBMODULES_RECURSE false
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/zydis
   BINARY_DIR ${BUILDS_DIR}/zydis
   CMAKE_ARGS
@@ -207,22 +261,14 @@ ExternalProject_Add(zydis_project
 
   -DZYDIS_BUILD_TOOLS:BOOL=OFF
   -DZYDIS_BUILD_EXAMPLES:BOOL=OFF
+  -DZYAN_ZYCORE_PATH=${ZYCORE_PATH}
 )
-
-ExternalProject_Add(zydis_core_project
-  SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/zydis/dependencies/zycore
-  BINARY_DIR ${BUILDS_DIR}/zydis_core
-  CMAKE_ARGS
-  -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-  -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
-  -DCMAKE_INSTALL_MESSAGE=${CMAKE_INSTALL_MESSAGE}
-  -DCMAKE_C_FLAGS=${CMAKE_C_FLAGS}
-  -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-  -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-  -DCMAKE_PREFIX_PATH:STRING=${INSTALL_DIR}
-)
+ExternalProject_Add_StepDependencies(zydis_project install zydis_core_project)
 
 ExternalProject_Add(tracy_project
+  GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+  GIT_TAG ${TPV_TRACY_VER}
+  GIT_SHALLOW true
   SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/tracy
   BINARY_DIR ${BUILDS_DIR}/tracy
   CMAKE_ARGS
@@ -247,15 +293,34 @@ ExternalProject_Add(tracy_project
   -DTRACY_NO_CRASH_HANDLER:BOOL=ON
 )
 
-add_library(imgui STATIC
-  ${CMAKE_SOURCE_DIR}/projects/imgui/imgui_draw.cpp
-  ${CMAKE_SOURCE_DIR}/projects/imgui/imgui_tables.cpp
-  ${CMAKE_SOURCE_DIR}/projects/imgui/imgui_widgets.cpp
-  ${CMAKE_SOURCE_DIR}/projects/imgui/imgui_demo.cpp
-  ${CMAKE_SOURCE_DIR}/projects/imgui/imgui.cpp
+ExternalProject_Add(magic_enum
+  GIT_REPOSITORY https://github.com/Neargye/magic_enum.git
+  GIT_TAG ${TPV_MAGICENUM_VER}
+  GIT_SHALLOW true
+  SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/magic_enum
+  BINARY_DIR ${BUILDS_DIR}/magic_enum
+  CMAKE_ARGS
+  -DCMAKE_INSTALL_PREFIX=${INSTALL_DIR}
+  -DCMAKE_INSTALL_MESSAGE=${CMAKE_INSTALL_MESSAGE}
+)
 
-  ${CMAKE_SOURCE_DIR}/projects/imgui/backends/imgui_impl_sdl3.cpp
-  ${CMAKE_SOURCE_DIR}/projects/imgui/backends/imgui_impl_vulkan.cpp
+FetchContent_Declare(imgui
+  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_TAG ${TPV_IMGUI_VER}
+  GIT_SHALLOW true
+  SOURCE_DIR ${CMAKE_SOURCE_DIR}/projects/imgui
+)
+FetchContent_MakeAvailable(imgui)
+
+add_library(imgui STATIC
+  ${imgui_SOURCE_DIR}/imgui_draw.cpp
+  ${imgui_SOURCE_DIR}/imgui_tables.cpp
+  ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+  ${imgui_SOURCE_DIR}/imgui_demo.cpp
+  ${imgui_SOURCE_DIR}/imgui.cpp
+
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
+  ${imgui_SOURCE_DIR}/backends/imgui_impl_vulkan.cpp
 )
 
 set_target_properties(imgui
