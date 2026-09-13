@@ -49,10 +49,6 @@ jobs:
         - name: Run preparation command
           run: ${{ matrix.config.preparation }}
 
-        - name: Apply Boost Thread Patch
-          working-directory: projects/boost/libs/thread
-          run: git apply ../../../../patches/boost_thread.patch
-
         - name: Detect MSVC
           uses: ilammy/msvc-dev-cmd@v1.13.0
           if: ${{ matrix.config.name == 'Windows' }}
