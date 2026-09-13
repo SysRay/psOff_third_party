@@ -15,7 +15,7 @@ fi
 git submodule update --init --depth 1 tools/boostdep;
 for lib in $LIBS; do
   git submodule update --init --depth 1 "libs/$lib";
-  python tools/boostdep/depinst/depinst.py -g "--depth 1 --jobs 4" $lib;
+  python tools/boostdep/depinst/depinst.py -X test -X example -g "--depth 1 --jobs 4" $lib;
 done
 cd libs/thread
 git apply ../../../../patches/boost_thread.patch
