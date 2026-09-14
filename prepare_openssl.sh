@@ -10,6 +10,7 @@ INSTALL_PREFIX="$1";
 OPENSSL_REF="openssl-3.6.4";
 REPO_DIR="./projects/OpenSSL";
 BUILD_TYPE="--release";
+PERL_INTERPRETER="perl";
 
 if [[ "$2" == "Debug" ]]; then
   BUILD_TYPE="--debug";
@@ -32,6 +33,7 @@ case "$(uname -s)" in
         ;;
     MINGW*|MSYS*)
         CONFIG_TARGET="mingw64";
+        PERL_INTERPRETER="/c/Strawberry/perl/bin/perl";
         ;;
     *)
         echo "Unsupported platform: $(uname -s)" >&2;
@@ -86,7 +88,7 @@ fi
 
 (
     cd "$REPO_DIR";
-    perl Configure "$CONFIG_TARGET" \
+    "$PERL_INTERPRETER" Configure "$CONFIG_TARGET" \
         "${CONFIGURE_FLAGS[@]}" \
         "${BUILD_TYPE}" \
         --prefix="$INSTALL_PREFIX" \
