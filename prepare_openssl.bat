@@ -10,7 +10,6 @@ set "INSTALL_PREFIX=%~1"
 set "OPENSSL_REF=openssl-3.6.4"
 set "REPO_DIR=projects\OpenSSL"
 set "BUILD_TYPE=--release"
-set "CL=%CL% /FS"
 
 if /I "%~2"=="Debug" set "BUILD_TYPE=--debug"
 if not exist "%INSTALL_PREFIX%" mkdir "%INSTALL_PREFIX%"
@@ -43,13 +42,13 @@ if errorlevel 1 (
     goto :fail
 )
 
-C:\jom\jom.exe /j %NUMBER_OF_PROCESSORS% /S
+nmake
 if errorlevel 1 (
     popd
     goto :fail
 )
 
-C:\jom\jom.exe install_sw
+nmake install_sw
 if errorlevel 1 (
     popd
     goto :fail
