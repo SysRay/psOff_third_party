@@ -42,12 +42,16 @@ jobs:
           with:
             submodules: recursive
 
-        - name: Prepare boost
-          shell: bash
-          run: ./prepare_boost.sh
-
         - name: Run preparation command
           run: ${{ matrix.config.preparation }}
+
+        - name: Install jom
+          if: ${{ matrix.config.name == 'Windows' }}
+          run: |
+            mkdir C:\jom
+            Invoke-WebRequest -Uri "https://download.qt.io/official_releases/jom/jom_1_1_7.zip" -OutFile C:\jom\jom.zip
+            Expand-Archive -Path C:\jom\jom.zip -DestinationPath C:\jom
+            "C:\jom" | Out-File -FilePath "$env:GITHUB_PATH" -Append
 
         - name: Detect MSVC
           uses: igor725/msvc-dev-cmd@v1
@@ -58,6 +62,10 @@ jobs:
         - name: Prepare OpenSSL
           shell: bash
           run: ./prepare_openssl.sh "_build/_Release/install" "${{ matrix.config.build_type }}"
+
+        - name: Prepare boost
+          shell: bash
+          run: ./prepare_boost.sh
 
         - name: Prepare Vulkan SDK
           uses: jakoch/install-vulkan-sdk-action@v1.6.0

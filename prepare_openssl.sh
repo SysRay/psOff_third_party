@@ -86,8 +86,8 @@ fi
 
 MAKE_BIN="make";
 if [[ "$CONFIG_TARGET" == "VC-WIN64A" ]]; then
-  MAKE_BIN="nmake";
-  JOBS="";
+  MAKE_BIN="jom";
+  JOBS="/j$JOBS /S";
 else
   JOBS="-j$JOBS";
 fi
