@@ -45,6 +45,13 @@ jobs:
         - name: Run preparation command
           run: ${{ matrix.config.preparation }}
 
+        - name: Install jom
+          if: ${{ matrix.config.name == 'Windows' }}
+          run: |
+            mkdir C:\jom
+            Invoke-WebRequest -Uri "https://download.qt.io/official_releases/jom/jom_1_1_7.zip" -OutFile C:\jom\jom.zip
+            Expand-Archive -Path C:\jom\jom.zip -DestinationPath C:\jom
+
         - name: Detect MSVC
           uses: igor725/msvc-dev-cmd@v1
           if: ${{ matrix.config.name == 'Windows' }}
