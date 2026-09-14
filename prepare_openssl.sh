@@ -86,6 +86,7 @@ MAKE_ARGS=("-j$JOBS");
 if [[ "$CONFIG_TARGET" == "VC-WIN64A" ]]; then
   MAKE_PROG="/c/jom/jom.exe";
   MAKE_ARGS=("/j$JOBS" "/S");
+  export CL="${CL:-} /FS";
 else
   JOBS="-j$JOBS";
 fi
