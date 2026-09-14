@@ -82,9 +82,10 @@ else
 fi
 
 MAKE_PROG="make";
+MAKE_ARGS=("-j$JOBS");
 if [[ "$CONFIG_TARGET" == "VC-WIN64A" ]]; then
   MAKE_PROG="/c/jom/jom.exe";
-  JOBS="/j$JOBS /S";
+  MAKE_ARGS=("/j$JOBS" "/S");
 else
   JOBS="-j$JOBS";
 fi
@@ -97,6 +98,6 @@ fi
       --prefix="$INSTALL_PREFIX" \
       --openssldir="$INSTALL_PREFIX/ssl";
 
-  "$MAKE_PROG" "$JOBS";
+  MSYS_NO_PATHCONV=1 "$MAKE_PROG" "${MAKE_ARGS[@]}";
   "$MAKE_PROG" install_sw;
 )
