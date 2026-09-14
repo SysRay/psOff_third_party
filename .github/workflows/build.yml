@@ -46,18 +46,18 @@ jobs:
           shell: bash
           run: ./prepare_boost.sh
 
-        - name: Prepare OpenSSL
-          shell: bash
-          run: ./prepare_openssl.sh "_build/_Release/install" "${{ matrix.config.build_type }}"
-
         - name: Run preparation command
           run: ${{ matrix.config.preparation }}
 
         - name: Detect MSVC
-          uses: ilammy/msvc-dev-cmd@v1.13.0
+          uses: igor725/msvc-dev-cmd@v1
           if: ${{ matrix.config.name == 'Windows' }}
           with:
             arch: x86_64
+
+        - name: Prepare OpenSSL
+          shell: bash
+          run: ./prepare_openssl.sh "_build/_Release/install" "${{ matrix.config.build_type }}"
 
         - name: Prepare Vulkan SDK
           uses: jakoch/install-vulkan-sdk-action@v1.6.0
