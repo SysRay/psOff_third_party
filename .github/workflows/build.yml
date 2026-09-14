@@ -51,7 +51,6 @@ jobs:
             mkdir C:\jom
             Invoke-WebRequest -Uri "https://download.qt.io/official_releases/jom/jom_1_1_7.zip" -OutFile C:\jom\jom.zip
             Expand-Archive -Path C:\jom\jom.zip -DestinationPath C:\jom
-            "C:\jom" | Out-File -FilePath "$env:GITHUB_PATH" -Append
 
         - name: Detect MSVC
           uses: igor725/msvc-dev-cmd@v1

@@ -73,20 +73,17 @@ CONFIGURE_FLAGS=(
   no-ui-console
 );
 
-JOBS="${JOBS:-}";
-if [[ -z "$JOBS" ]]; then
-  if command -v nproc >/dev/null 2>&1; then
-      JOBS="$(nproc)";
-  elif [[ -n "${NUMBER_OF_PROCESSORS:-}" ]]; then
-      JOBS="$NUMBER_OF_PROCESSORS";
-  else
-      JOBS=4;
-  fi
+if command -v nproc >/dev/null 2>&1; then
+    JOBS="$(nproc)";
+elif [[ -n "${NUMBER_OF_PROCESSORS:-}" ]]; then
+    JOBS="$NUMBER_OF_PROCESSORS";
+else
+    JOBS=4;
 fi
 
-MAKE_BIN="make";
+MAKE_PROG="make";
 if [[ "$CONFIG_TARGET" == "VC-WIN64A" ]]; then
-  MAKE_BIN="jom";
+  MAKE_PROG="/c/jom/jom.exe";
   JOBS="/j$JOBS /S";
 else
   JOBS="-j$JOBS";
@@ -100,6 +97,6 @@ fi
       --prefix="$INSTALL_PREFIX" \
       --openssldir="$INSTALL_PREFIX/ssl";
 
-  "$MAKE_BIN" "$JOBS";
-  "$MAKE_BIN" install_sw;
+  "$MAKE_PROG" "$JOBS";
+  "$MAKE_PROG" install_sw;
 )
