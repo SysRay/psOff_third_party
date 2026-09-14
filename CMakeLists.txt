@@ -121,10 +121,6 @@ ExternalProject_Add_StepDependencies(libpng_project install zlib_project)
 
 install(DIRECTORY "projects/ffmpeg/include/" DESTINATION "${INSTALL_DIR}/include")
 
-install(DIRECTORY "projects/openssl/bin/" DESTINATION "${INSTALL_DIR}/bin")
-install(DIRECTORY "projects/openssl/include/" DESTINATION "${INSTALL_DIR}/include")
-install(DIRECTORY "projects/openssl/lib/" DESTINATION "${INSTALL_DIR}/lib")
-
 install(DIRECTORY "projects/nlohmann/" DESTINATION ${INSTALL_DIR}/include/nlohmann
   FILES_MATCHING PATTERN "*.hpp"
 )

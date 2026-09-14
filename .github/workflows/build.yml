@@ -46,6 +46,10 @@ jobs:
           shell: bash
           run: ./prepare_boost.sh
 
+        - name: Prepare OpenSSL
+          shell: bash
+          run: ./prepare_openssl.sh "_build/_Release/install" "${{ matrix.config.build_type }}"
+
         - name: Run preparation command
           run: ${{ matrix.config.preparation }}
 
