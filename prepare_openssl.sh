@@ -64,6 +64,7 @@ CONFIGURE_FLAGS=(
       "${CONFIGURE_FLAGS[@]}" \
       "${BUILD_TYPE}" \
       --prefix="$INSTALL_PREFIX" \
+      --libdir="$INSTALL_PREFIX/lib" \
       --openssldir="$INSTALL_PREFIX/ssl";
 
   make "-j$(nproc)";
